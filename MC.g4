@@ -20,7 +20,6 @@ public Token emit() {
     case ILLEGAL_ESCAPE:
     	result = super.emit();
     	throw new IllegalEscape(result.getText());
-
     case ERROR_CHAR:
     	result = super.emit();
     	throw new ErrorToken(result.getText());	
@@ -88,13 +87,14 @@ FLOATLIT:[0-9]*'.'[0-9]*|[0-9]*('e'|'E')[0-9]*;
 TRUELIT: 'true';
 FALSELIT: 'false';
 
-STRINGLIT: '"' (.|ESCSEQ)*? '"';
+STRINGLIT: '"' (STRCHAR|ESCSEQ)* '"';
+STRCHAR: ~('\\'|'"');
 ESCSEQ: ('\\''b' | '\\''f' | '\\''r''\\''n' |'\\''t' | '\\''\'' | '\\''"'|'\\''\\' );
 
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 
 
 ERROR_CHAR:[@#$%^~`];
-UNCLOSE_STRING: '"' (.| ESCSEQ)*? ;
-ILLEGAL_ESCAPE: '"'(.|ESCSEQ)*?NOTESCSEQ;
+ILLEGAL_ESCAPE: '"'(STRCHAR|ESCSEQ)*NOTESCSEQ;
+UNCLOSE_STRING: '"' (STRCHAR|ESCSEQ)* ~('"') ;
 NOTESCSEQ: '\\'~('b'|'f'| '\'' | '"' | '\\') |'\\''r''\\'~('n');
